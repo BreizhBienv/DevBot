@@ -161,6 +161,9 @@ void AJackalRobot::SetIsWorking(bool bNewIsWorking)
 
 void AJackalRobot::UpdateSpeedValues()
 {
+    if (!BodyMesh)
+        return;
+    
     LinearSpeed = FVector::DotProduct(BodyMesh->GetPhysicsLinearVelocity(), BodyMesh->GetForwardVector()); //FVector::Dist(PreviousBodyLocation, NewBodyLocation) / DeltaSeconds;
     YawAngularSpeed = BodyMesh->GetPhysicsAngularVelocityInDegrees().Z; //FMath::Abs(PreviousBodyYawRotation - NewBodyYawRotation) / DeltaSeconds;
 }
@@ -182,7 +185,7 @@ void AJackalRobot::UpdateBatteryConsumption(float DeltaSeconds)
     }
     
     // Update battery states & warnings
-    if (BatteryLevel > BatteryCapacity / 1.1f)
+    if (BatteryLevel > BatteryCapacity * 0.9f)
     {
         // Battery full
         if (BatteryState != EBatteryState::BatteryFull)
@@ -191,7 +194,7 @@ void AJackalRobot::UpdateBatteryConsumption(float DeltaSeconds)
             OnBatteryFull.Broadcast();
         }
     }
-    else if (BatteryLevel > BatteryCapacity / 4.f)
+    else if (BatteryLevel > BatteryCapacity * 0.4f)
     {
         // Battery high
         if (BatteryState != EBatteryState::BatteryHigh) 
@@ -200,7 +203,7 @@ void AJackalRobot::UpdateBatteryConsumption(float DeltaSeconds)
             OnBatteryHigh.Broadcast();
         }
     } 
-    else if (BatteryLevel > BatteryCapacity / 20.f)
+    else if (BatteryLevel > BatteryCapacity * 0.2f)
     {
         // Battery low
         if (BatteryState != EBatteryState::BatteryLow)
