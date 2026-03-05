@@ -20,6 +20,9 @@ struct FSpatialGridCell
 	bool bIsCellExplored = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsNavigable = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<int32> CellPropIDs;
 };
 
@@ -36,9 +39,6 @@ struct FSpatialMemoryElement
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float ElementReward = 0.f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int ElementID = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Timestamp = 0.f;
@@ -62,7 +62,7 @@ public:
 	FOnMapUpdated OnMapUpdated;
 
 	UFUNCTION(BlueprintCallable, Category = "SpatialMemory|Objects")
-	void AddSpatialMemoryElement(FSpatialMemoryElement NewElement);
+	void AddSpatialMemoryElement(int Id, FSpatialMemoryElement NewElement);
 
 	UFUNCTION(BlueprintCallable, Category = "SpatialMemory|Objects")
 	void StoreDetectedActorsArray(TArray<AActor*> DetectedActorsArray);
@@ -71,26 +71,53 @@ public:
 	void StoreDetectedActor(AActor* DetectedActor);
 
 	UFUNCTION(BlueprintCallable, Category = "SpatialMemory|Objects")
-	void MergeSpatialMemoryMaps(TArray<FSpatialMemoryElement> OtherMap);
+	void MergeSpatialMemoryMaps(TMap<int, FSpatialMemoryElement> OtherMap);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SpatialMemory|Objects")
-	TArray<FSpatialMemoryElement> GetSpatialItemsMemory();
+	TMap<int, FSpatialMemoryElement> GetSpatialItemsMemory();
+	
+	UFUNCTION(BlueprintCallable)
+	void AddCell(FIntVector CellID);
+	
+	UFUNCTION(BlueprintCallable)
+	void GenerateAdjacentCells(FIntVector OriginCellID);
+	
+	UFUNCTION(BlueprintCallable)
+	bool IsCellExploredWorldCoord(FVector worldCoord);
 
+	UFUNCTION(BlueprintCallable)
+	bool IsCellExplored(FIntVector CellID);
+	
 	UFUNCTION(BlueprintCallable)
 	void ExploreCell(FIntVector CellID);
 
 	UFUNCTION(BlueprintCallable)
-	FIntVector GetCurrentCell();
+	FIntVector GetCellID(FVector worldCoordinate);
+	
+	UFUNCTION(BlueprintCallable)
+	FIntVector GetCurrentCellID();
 
 	UFUNCTION(BlueprintCallable)
 	TArray<FSpatialGridCell> GetSpatialGrid();
+	
+	UFUNCTION(BlueprintCallable)
+	int GetCellArrayID(FIntVector CellID);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector FromCellToWorldCoord(FIntVector CellId);
 
-protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FIntVector GetCellSize();
+	
+protected:	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SpatialMemory|Objects")
-	TArray<FSpatialMemoryElement> SpatialItemsMemory;
+	TMap<int, FSpatialMemoryElement> SpatialItemsMemory;
 
 	UPROPERTY(EditDefaultsOnly)
 	FIntVector CellSize = FIntVector(500, 500, 100); // Default cell size is 5 by 5 by 1 meters
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector WorldPosOffset = FVector(0, 0, 0);
 
 	UPROPERTY(BlueprintReadOnly)
 	TArray<FSpatialGridCell> SpatialGrid;

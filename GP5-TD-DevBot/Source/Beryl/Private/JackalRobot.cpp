@@ -23,7 +23,7 @@ UStaticMeshComponent* AJackalRobot::GetBodyMesh()
 void AJackalRobot::BeginPlay()
 {
 	Super::BeginPlay();
-
+    
     // Set Jackal physical properties
     BodyMesh->SetCenterOfMass(FVector(0.f, 0.f, 15.f));
     BodyMesh->SetAngularDamping(1.75);
