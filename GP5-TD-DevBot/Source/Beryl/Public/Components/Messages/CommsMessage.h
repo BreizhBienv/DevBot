@@ -6,12 +6,12 @@
 #include "UObject/NoExportTypes.h"
 #include "CommsMessage.generated.h"
 
+class AJackalRobot;
 
 UCLASS(Blueprintable)
 class BERYL_API UCommsMessage : public UObject
 {
 	GENERATED_BODY()
-
 
 public:
 
@@ -20,6 +20,9 @@ public:
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     int SenderID;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	AJackalRobot* SenderComponent;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     int TargetReceiverID = -1;
@@ -27,13 +30,16 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     float Timestamp;
 
+	TFunction<float(AJackalRobot*, AJackalRobot*)> ToExecute;
+	
 	UFUNCTION(BlueprintCallable)
 	static UCommsMessage* CreateCommsMessage(UObject* Outer, int NewSenderID, const FVector& NewSenderLocation, 
-											int NewTargetReceiverID = -1, float NewTimestamp = 0.f)
+											AJackalRobot* Sender, int NewTargetReceiverID = -1, float NewTimestamp = 0.f)
 	{
 		UCommsMessage* NewMessage = NewObject<UCommsMessage>(Outer);
 		if (NewMessage)
 		{
+            NewMessage->SenderComponent = Sender;
 			NewMessage->SenderID = NewSenderID;
 			NewMessage->SenderLocation = NewSenderLocation;
 			NewMessage->TargetReceiverID = NewTargetReceiverID;
@@ -41,5 +47,4 @@ public:
 		}
 		return NewMessage;
 	}
-	
 };

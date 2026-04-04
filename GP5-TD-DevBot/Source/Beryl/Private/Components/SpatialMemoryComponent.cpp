@@ -47,12 +47,27 @@ void USpatialMemoryComponent::StoreDetectedActor(AActor* DetectedActor)
 	AddSpatialMemoryElement(id, NewElement);
 }
 
-void USpatialMemoryComponent::MergeSpatialMemoryMaps(TMap<int, FSpatialMemoryElement> OtherMap)
+void USpatialMemoryComponent::MergeSpatialMemoryMaps(const TMap<int, FSpatialMemoryElement>& OtherMap)
 {
-	/**
-	 * TD - A COMPLETER - TD
-	 */
+	for (auto elem : OtherMap)
+	{
+		if (SpatialItemsMemory.Contains(elem.Key))
+		{
+			if (elem.Value.Timestamp < SpatialItemsMemory[elem.Key].Timestamp)
+				AddSpatialMemoryElement(elem.Key, elem.Value);
+		}
+		else
+			AddSpatialMemoryElement(elem.Key, elem.Value);
+	}	
+}
 
+void USpatialMemoryComponent::MergeSpatialGrid(const TArray<FSpatialGridCell>& otherMap)
+{
+	for (FSpatialGridCell cell : otherMap)
+	{
+		if (GetCellArrayID(cell.CellCoordinates) == -1)
+			SpatialGrid.Add(cell);
+	}
 }
 
 TMap<int, FSpatialMemoryElement> USpatialMemoryComponent::GetSpatialItemsMemory()
@@ -150,15 +165,22 @@ TArray<FSpatialGridCell> USpatialMemoryComponent::GetSpatialGrid()
 	return SpatialGrid;
 }
 
-int USpatialMemoryComponent::GetCellArrayID(FIntVector CellID)
-{
-	for (int i = 0; i < SpatialGrid.Num(); i++)
-	{
-		if (SpatialGrid[i].CellCoordinates == CellID)
-			return i;
-	}
+int USpatialMemoryComponent::GetCellArrayID(const FIntVector& CellID)
+{	
+	int id = SpatialGrid.IndexOfByPredicate(
+		[CellID](const FSpatialGridCell& InItem)
+		{
+			return InItem.CellCoordinates == CellID;
+		});
+	return id == INDEX_NONE ? -1 : id;
 	
-	return -1;
+	// for (int i = 0; i < SpatialGrid.Num(); i++)
+	// {
+	// 	if (SpatialGrid[i].CellCoordinates == CellID)
+	// 		return i;
+	// }
+	//
+	// return -1;
 }
 
 FVector USpatialMemoryComponent::FromCellToWorldCoord(FIntVector CellId)
@@ -171,5 +193,11 @@ FIntVector USpatialMemoryComponent::GetCellSize()
 	return CellSize;
 }
 
-
-
+FSpatialMemoryData USpatialMemoryComponent::GetSpatialMemoryData()
+{
+	FSpatialMemoryData pingScoreData;
+	pingScoreData.SpatialGridCells = SpatialGrid;
+	pingScoreData.SpatialMemoryElement = SpatialItemsMemory;
+	
+	return pingScoreData;
+}

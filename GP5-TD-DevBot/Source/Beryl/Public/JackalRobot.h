@@ -262,6 +262,12 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
     int GetJackalId();
+    
+    UFUNCTION()
+    UCommsComponent* GetCommsComponent() { return CommsComponent; }
+    
+    UFUNCTION()
+    USpatialMemoryComponent* GetSpatialMemoryComponent() {return MapMemoryComponent; }
 };
 
 

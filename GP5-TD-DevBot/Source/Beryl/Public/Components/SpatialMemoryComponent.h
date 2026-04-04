@@ -7,7 +7,6 @@
 
 class AJackalRobot;
 
-
 USTRUCT(BlueprintType)
 struct FSpatialGridCell
 {
@@ -44,6 +43,18 @@ struct FSpatialMemoryElement
 	float Timestamp = 0.f;
 };
 
+USTRUCT(Blueprintable)
+struct FSpatialMemoryData
+{
+	GENERATED_BODY()
+    
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Comms")
+	TArray<FSpatialGridCell> SpatialGridCells;
+    
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Comms")
+	TMap<int, FSpatialMemoryElement> SpatialMemoryElement;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(
 	FOnMapUpdated
 );
@@ -71,7 +82,10 @@ public:
 	void StoreDetectedActor(AActor* DetectedActor);
 
 	UFUNCTION(BlueprintCallable, Category = "SpatialMemory|Objects")
-	void MergeSpatialMemoryMaps(TMap<int, FSpatialMemoryElement> OtherMap);
+	void MergeSpatialMemoryMaps(const TMap<int, FSpatialMemoryElement>& OtherMap);
+	
+	UFUNCTION(BlueprintCallable, Category = "SpatialMemory|Objects")
+	void MergeSpatialGrid(const TArray<FSpatialGridCell>& otherMap);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SpatialMemory|Objects")
 	TMap<int, FSpatialMemoryElement> GetSpatialItemsMemory();
@@ -101,13 +115,16 @@ public:
 	TArray<FSpatialGridCell> GetSpatialGrid();
 	
 	UFUNCTION(BlueprintCallable)
-	int GetCellArrayID(FIntVector CellID);
+	int GetCellArrayID(const FIntVector& CellID);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector FromCellToWorldCoord(FIntVector CellId);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FIntVector GetCellSize();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FSpatialMemoryData GetSpatialMemoryData();
 	
 protected:	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SpatialMemory|Objects")

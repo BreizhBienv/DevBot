@@ -11,7 +11,7 @@ AJackalRobot::AJackalRobot()
 	PrimaryActorTick.bCanEverTick = true;
 
     CommsComponent = CreateDefaultSubobject<UCommsComponent>(TEXT("Comms"));
-    MapMemoryComponent = CreateDefaultSubobject<USpatialMemoryComponent>(TEXT("RobotMap"));
+    MapMemoryComponent = CreateDefaultSubobject<USpatialMemoryComponent>(TEXT("SpatialMemoryComponent_PLEASE"));
 }
 
 UStaticMeshComponent* AJackalRobot::GetBodyMesh()
