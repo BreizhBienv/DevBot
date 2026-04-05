@@ -50,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	EInteractivePropType GetPropType();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	int GetPropId();
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

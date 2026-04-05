@@ -122,7 +122,7 @@ void UCommsComponent::SendDelayedMessage(
     );
 }
 
-float UCommsComponent::ExchangeData(AJackalRobot* r1, AJackalRobot* r2)
+void UCommsComponent::ExchangeData(AJackalRobot* r1, AJackalRobot* r2)
 {
     UCommsComponent* c1 = r1->GetCommsComponent();
     UCommsComponent* c2 = r1->GetCommsComponent();
@@ -142,7 +142,7 @@ float UCommsComponent::ExchangeData(AJackalRobot* r1, AJackalRobot* r2)
     c1->LastPingScoreData = d1;
     c2->LastPingScoreData = d2;
     
-    return 2.0f; 
+    //return 2.0f; 
     //0.5 per merge. 
     //Which data to be merged should be chosen and not send everything. 
     //0.5 should depend on the number of element retrieved per jackal.
@@ -160,7 +160,7 @@ UCommsMessage* UCommsComponent::CreateCommsMessageExchangeData(UObject* Outer, i
             CurrentMessage->SenderLocation = NewSenderLocation;
             CurrentMessage->TargetReceiverID = NewTargetReceiverID;
             CurrentMessage->Timestamp = NewTimestamp;
-            CurrentMessage->ToExecute= UCommsComponent::ExchangeData;
+            CurrentMessage->ToExecute.AddDynamic(this, &UCommsComponent::ExchangeData);
         }
         return CurrentMessage;
     }
@@ -168,5 +168,9 @@ UCommsMessage* UCommsComponent::CreateCommsMessageExchangeData(UObject* Outer, i
 
 float UCommsComponent::ExecuteMessage(UCommsMessage* message, AJackalRobot* sender, AJackalRobot* other)
 {
-    return message->ToExecute(sender, other);
+    float result = 2.0f;
+    if (message->ToExecute.IsBound())
+        message->ToExecute.Broadcast(sender, other);
+    
+    return result;
 }

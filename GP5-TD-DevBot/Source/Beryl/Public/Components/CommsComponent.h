@@ -112,7 +112,7 @@ public:
     void AnswerToSender(UCommsComponent* Sender, UCommsMessage* Message);
     
     UFUNCTION(BlueprintCallable, Category = "Communication")
-    static float ExchangeData(AJackalRobot* r1, AJackalRobot* r2);
+    void ExchangeData(AJackalRobot* r1, AJackalRobot* r2);
     
     UFUNCTION(BlueprintCallable, Category = "Communication")
     UCommsMessage* CreateCommsMessageExchangeData(UObject* Outer, int NewSenderID, const FVector& NewSenderLocation,  

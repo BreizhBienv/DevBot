@@ -44,30 +44,50 @@ void USpatialMemoryComponent::StoreDetectedActor(AActor* DetectedActor)
 		NewElement.Location = DetectedInteractiveProp->GetActorLocation();
 	}
 
+	if (NewElement.DetectedObject == EInteractivePropType::Unknown)
+		return;
+	
 	AddSpatialMemoryElement(id, NewElement);
 }
 
 void USpatialMemoryComponent::MergeSpatialMemoryMaps(const TMap<int, FSpatialMemoryElement>& OtherMap)
 {
+	int itemAdded = 0, itemUpdated = 0;
 	for (auto elem : OtherMap)
 	{
 		if (SpatialItemsMemory.Contains(elem.Key))
 		{
 			if (elem.Value.Timestamp < SpatialItemsMemory[elem.Key].Timestamp)
+			{
 				AddSpatialMemoryElement(elem.Key, elem.Value);
+				++itemUpdated;
+			}
 		}
 		else
+		{
 			AddSpatialMemoryElement(elem.Key, elem.Value);
-	}	
+			++itemAdded;
+		}
+	}
+	
+	// if(GEngine)
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Got %d items and updated %d"), itemAdded, itemUpdated));
 }
 
 void USpatialMemoryComponent::MergeSpatialGrid(const TArray<FSpatialGridCell>& otherMap)
 {
+	int cellAdded = 0;
 	for (FSpatialGridCell cell : otherMap)
 	{
 		if (GetCellArrayID(cell.CellCoordinates) == -1)
+		{
 			SpatialGrid.Add(cell);
+			++cellAdded;
+		}
 	}
+	
+	// if(GEngine)
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Got %d cells "), cellAdded));
 }
 
 TMap<int, FSpatialMemoryElement> USpatialMemoryComponent::GetSpatialItemsMemory()

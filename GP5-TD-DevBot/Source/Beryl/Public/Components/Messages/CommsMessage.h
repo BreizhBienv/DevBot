@@ -8,6 +8,12 @@
 
 class AJackalRobot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FToExecute,
+	AJackalRobot*, Sender,
+	AJackalRobot*, Other
+);
+
 UCLASS(Blueprintable)
 class BERYL_API UCommsMessage : public UObject
 {
@@ -30,7 +36,9 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
     float Timestamp;
 
-	TFunction<float(AJackalRobot*, AJackalRobot*)> ToExecute;
+	//TArray<TFunction<float(AJackalRobot*, AJackalRobot*)>> ToExecute;
+	UPROPERTY(BlueprintAssignable)
+	FToExecute ToExecute;
 	
 	UFUNCTION(BlueprintCallable)
 	static UCommsMessage* CreateCommsMessage(UObject* Outer, int NewSenderID, const FVector& NewSenderLocation, 
